@@ -1,11 +1,9 @@
 from fastapi import FastAPI, File, UploadFile
-import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from data_transform import transform
+from model_prediction import predict
 
 app = FastAPI()
 
-model = load_model('../Model/AccidentDetection.h5')
 
 @app.get('/')
 def index():
@@ -15,16 +13,12 @@ def index():
 async def index(file: UploadFile = File(...)):
     try:
         img_content = await file.read()
-        with open(file.filename,'wb') as f:
-            f.write(img_content)
-        img = load_img(file.filename,target_size=(250,250))
-        img = img_to_array(img)
-        img = np.expand_dims(img,axis=0)
-        print('Img Shape:',img.shape)
-        prediction = model.predict(img)
-        prediction = prediction.astype('float32')
-        print(prediction)
-        return prediction
+        img = transform(img_content)
+        prediction = predict(img)
+        if prediction[0] == 0:
+            return {'Prediction':'Accident'}
+        else:
+            return {'Prediction':'Non Accident'}
     except Exception as e:
         print("Error:",e)
-        return e
+        return {"Error":"Something Bad Happened."}
