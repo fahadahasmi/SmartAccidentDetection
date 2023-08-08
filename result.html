@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="shortcut icon" href="Assests/accident.png" type="image/x-icon">
+        <title>Accident Detection and Handling</title>
+        <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+        <style type='text/css'>body{margin:0;padding:0;overflow:hidden;font-family:'Segoe UI',Helvetica,Arial,Sans-Serif}</style>
+    </head>
+    <body>
+        
+        
+        <div id='myMap' style='width: 100vw; height: 100vh;'></div>
+        <script type='text/javascript'>
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const lat = urlParams.get('lat');
+            const long = urlParams.get('long');
+            const result = urlParams.get('result');
+
+            console.log(lat);    // Output: "19.02"
+            console.log(long);   // Output: "72.43"
+            console.log(result); // Output: "Acc"
+            
+
+            var dest = []
+            var nearestHosp = []
+            const BingMapsKey = 'AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C'
+            const url = `http://dev.virtualearth.net/REST/v1/locationrecog/${lat},${long}?key=${BingMapsKey}&output=json&r=2&type=Hospitals`
+            
+
+            fetch(url)
+            .then((res)=>res.json())
+            .then((data)=>{
+                const hospitals = data.resourceSets[0].resources[0].businessesAtLocation
+                for(let i=0;i < data.resourceSets[0].resources[0].businessesAtLocation.length;i++){
+                    nearestHosp.push([hospitals[i].businessAddress.latitude,hospitals[i].businessAddress.longitude])
+                }
+                dest.push(nearestHosp[0][0])
+                dest.push(nearestHosp[0][1])
+                console.log(nearestHosp)
+            }).catch((e)=>{
+                console.error(e)
+            })
+
+            function loadMapScenario() {
+                var map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+                    /* No need to set credentials if already passed in URL */
+                    center: new Microsoft.Maps.Location(lat,long),
+                    zoom: 12
+                });
+                
+                for(hosp of nearestHosp){
+                    const location = new Microsoft.Maps.Location(hosp[0], hosp[1]); // set the location of the marker
+                    const pin = new Microsoft.Maps.Pushpin(location); // create the marker object
+                    map.entities.push(pin);
+                }
+                
+                console.log(dest)
+                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+                    var directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                    // Set Route Mode to driving
+                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.driving });
+                    
+                    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({  location: new Microsoft.Maps.Location(lat, long) });
+                    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({  location: new Microsoft.Maps.Location(dest[0], dest[1]) });
+                    directionsManager.addWaypoint(waypoint1);
+                    directionsManager.addWaypoint(waypoint2);
+                    // Set the element in which the itinerary will be rendered
+                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
+                    directionsManager.calculateDirections();
+                });
+                
+            }
+        </script>
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C&callback=loadMapScenario' async defer></script>
+    </body>
+</html>

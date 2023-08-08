@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="Assests/accident.png" type="image/x-icon">
+    <title>Accident Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <link rel="stylesheet" href="Assests/CSS/style.css" />
+
+</head>
+
+<body>
+    <!-- <div class="left">
+            <p>Location</p>
+        </div> -->
+    <!-- <div class="right"> -->
+    <div class="container">
+
+        <h3>Accident Detector</h3>
+        <div class="drag-area">
+            <div class="icon">
+                <i class="fas fa-images"></i>
+            </div>
+            <span class="header"> Drag & Drop</span>
+            <span class="header">or <button class="filebutton">Browse File</button>
+            </span>
+            <!-- <span class="button"> browse</span> -->
+            <input type="file" hidden>
+            <span class="support">Supports: JPEG, JPG, PNG</span>
+        </div>
+    </div>
+    <!-- </div> -->
+
+    <!-- Modal Structure -->
+    <div id="id01" style="justify-content:center; flex-direction:column; align-items:center;" class="modal">
+        <div id="modal-cont" class="modal-content">
+            <h4 class="center-align"><strong>Predicted Result</strong></h4>
+            <h6 id="modal-text"></h6>
+            <img class="responsive-img" id="img" alt="Image" />
+        </div>
+        <div class="modal-footer">
+            <a href="" id="btn" class="modal-close waves-effect waves-green btn-flat"></a>
+        </div>
+    </div>
+
+    <button id="button" class="but"> Upload </button>
+    <script src="Assests/JS/script.js"></script>
+</body>
+
+</html>

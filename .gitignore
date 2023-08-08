@@ -1,3 +1,6 @@
 Dataset/*
-env/*
-src/__pycache__/*
+venv\*
+venv/*
+src\__pycache__\*
+src\data_transform\__pycache__\*
+src\model_prediction\__pycache__\*
