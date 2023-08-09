@@ -39,7 +39,7 @@ button.onclick = (e)=>{
     formdata.append("file", file);
     console.log(formdata);
 
-    fetch('http://127.0.0.1:8000/', {
+    fetch('https://accidentdetector.onrender.com/', {
         method: 'POST',
         body: formdata
     }).then(response => response.json())
@@ -51,7 +51,7 @@ button.onclick = (e)=>{
         if(result.Prediction  == "Accident"){
           modalText.innerText = result.Prediction + " has been detected.";
           btn.innerText = "Click Here to see the nearest hospitals.";
-          btn.href = "http://127.0.0.1:5500/Frontend/result.html?lat="+latitude+"&long="+longitude+"&result="+result.Prediction;
+          btn.href = "http://127.0.0.1:5500/result.html?lat="+latitude+"&long="+longitude+"&result="+result.Prediction;
         }
         else{
           modalText.innerText = "Accident has not been detected.";
