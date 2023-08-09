@@ -51,7 +51,7 @@ button.onclick = (e)=>{
         if(result.Prediction  == "Accident"){
           modalText.innerText = result.Prediction + " has been detected.";
           btn.innerText = "Click Here to see the nearest hospitals.";
-          btn.href = "http://127.0.0.1:5500/result.html?lat="+latitude+"&long="+longitude+"&result="+result.Prediction;
+          btn.href = "https://fahadahasmi.github.io/SmartAccidentDetection/result.html?lat="+latitude+"&long="+longitude+"&result="+result.Prediction;
         }
         else{
           modalText.innerText = "Accident has not been detected.";
