@@ -1,7 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from data_transform import transform
-from model_prediction import predict
+from data_transform import transform_image, transform_video
+from model_prediction import predict_image, predict_video
 
 app = FastAPI()
 
@@ -15,17 +15,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get('/')
+def index():
+    return "Index Page"
 
 @app.post('/')
 async def index(file: UploadFile = File(...)):
     try:
-        img_content = await file.read()
-        img = transform(img_content)
-        prediction = predict(img)
-        if prediction[0] == 0:
-            return {'Prediction':'Accident'}
+        content = await file.read()
+        if file.content_type.startswith('image/'):
+            data = transform_image(content)
+            prediction = predict_image(data)
+        elif file.content_type.startswith('video/'):
+            data = transform_video(content)
+            prediction = predict_video(data)
         else:
-            return {'Prediction':'Non Accident'}
+            return {"Error": "Unsupported file type."}
+        print(prediction)
+        return {'Prediction': 'Accident' if prediction[0] == 0 else 'Non Accident'}
     except Exception as e:
-        print("Error:",e)
-        return {"Error":"Something Bad Happened."}
+        print("Error:", e)
+        return {"Error": "Something Bad Happened."}
