@@ -9,3 +9,5 @@ src\data_transform\__pycache__\*
 src/data_transform/__pycache__/*
 src\model_prediction\__pycache__\*
 src/data_transform/__pycache__/*
+node_modules/*
+node_modules\*

@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="Assets/accident.png" type="image/x-icon">
+        <link rel="shortcut icon" href="https://img.icons8.com/?size=100&id=17768&format=png&color=000000" type="image/x-icon">
         <title>Accident Detection and Handling</title>
         <style>
             body {
@@ -82,118 +82,6 @@
             }
         </script>
         <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C&callback=loadMapScenario" async defer></script>
-        <div id="id01" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <p id="modal-text"></p>
-            </div>
-        </div>
-        <div class="drag-area">
-            <input type="file" id="fileInput">
-            <img id="img" src="" alt="Image Preview">
-            <video id="video" src="" controls style="display: none;"></video>
-        </div>
-        <button id="button">Upload</button>
-        <script type='text/javascript'>
-            var latitude, longitude;
-
-            // Check if geolocation is available
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    latitude = position.coords.latitude;
-                    longitude = position.coords.longitude;
-                    console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-                });
-            } else {
-                alert("Geolocation is not available.");
-            }
-
-            const uploadButton = document.getElementById('button');
-            const imgPreview = document.getElementById('img');
-            const videoPreview = document.getElementById('video');
-            const modal = document.getElementById('id01');
-            const modalText = document.getElementById('modal-text');
-            const dropArea = document.querySelector(".drag-area");
-            const fileInput = dropArea.querySelector("input");
-            let file; // Global variable to store the selected file
-
-            // Handle file selection
-            fileInput.addEventListener("change", function() {
-                file = this.files[0];
-                if (file) {
-                    showPreview(file);
-                }
-            });
-
-            // Handle drag and drop
-            dropArea.addEventListener("dragover", (event) => {
-                event.preventDefault();
-                dropArea.classList.add("active");
-            });
-
-            dropArea.addEventListener("dragleave", () => {
-                dropArea.classList.remove("active");
-            });
-
-            dropArea.addEventListener("drop", (event) => {
-                event.preventDefault();
-                file = event.dataTransfer.files[0];
-                if (file) {
-                    showPreview(file);
-                }
-            });
-
-            // Show file preview
-            function showPreview(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if (file.type.startsWith('image/')) {
-                        imgPreview.src = e.target.result;
-                        imgPreview.style.display = 'block';
-                        videoPreview.style.display = 'none';
-                        modalText.textContent = 'Image uploaded successfully!';
-                    } else if (file.type.startsWith('video/')) {
-                        videoPreview.src = e.target.result;
-                        videoPreview.style.display = 'block';
-                        imgPreview.style.display = 'none';
-                        modalText.textContent = 'Video uploaded successfully!';
-                    }
-                    $('#id01').modal('show');
-                };
-                reader.readAsDataURL(file);
-            }
-
-            // Handle upload button click
-            uploadButton.onclick = () => {
-                if (!file) {
-                    alert("Please select a file first.");
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append("file", file);
-
-                fetch('http://127.0.0.1:8000/', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(result => {
-                    console.log('Success:', result.Prediction);
-                    modal.style.display = "flex";
-                    if (result.Prediction === "Accident") {
-                        modalText.innerText = result.Prediction + " has been detected.";
-                        uploadButton.innerText = "Click Here to see the nearest hospitals.";
-                        uploadButton.href = `http://127.0.0.1:5500/result.html?lat=${latitude}&long=${longitude}&result=${result.Prediction}`;
-                    } else {
-                        modalText.innerText = "Accident has not been detected.";
-                        uploadButton.innerText = "Close";
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            };
-        </script>
+        
     </body>
 </html>

@@ -1,3 +1,6 @@
+import { SERVER_URL } from './constant.js';
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('file-input');
     const previewImg = document.getElementById('preview-img');
@@ -53,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loader.style.display = 'flex';
 
         // Simulate an API call
-        fetch("http://localhost:8000", {
+        fetch(SERVER_URL, {
             method: 'POST',
             body: formData
         })
