@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loader.style.display = 'flex';
 
         // Simulate an API call
+        console.log(SERVER_URL);
         fetch(SERVER_URL, {
             method: 'POST',
             body: formData
