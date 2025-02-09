@@ -1,89 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="https://img.icons8.com/?size=100&id=17768&format=png&color=000000" type="image/x-icon">
-        <title>Accident Detection and Handling</title>
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-                font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
-            }
-            #myMap {
-                width: 100vw;
-                height: 100vh;
-            }
-            #printoutPanel {
-                position: absolute;
-                top: 10px;
-                left: 10px;
-                background: rgba(255, 255, 255, 0.8);
-                padding: 10px;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                max-width: 300px;
-                z-index: 1000;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="printoutPanel"></div>
-        <div id="myMap"></div>
-        <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C" async defer></script>
-        <script type="text/javascript">
-            function loadMapScenario(lat, long, nearestHosp) {
-                const map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
-                    center: new Microsoft.Maps.Location(lat, long),
-                    zoom: 12
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://img.icons8.com/?size=100&id=17768&format=png&color=000000" type="image/x-icon">
+    <title>Accident Detection and Handling</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
+        }
+        #myMap {
+            width: 100vw;
+            height: 100vh;
+        }
+        #printoutPanel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="printoutPanel"></div>
+    <div id="myMap"></div>
+    <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C" async defer></script>
+    <script type="text/javascript">
+        function loadMapScenario(lat, long, nearestHosp) {
+            const map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
+                center: new Microsoft.Maps.Location(lat, long),
+                zoom: 12
+            });
+
+            nearestHosp.forEach(hosp => {
+                const location = new Microsoft.Maps.Location(hosp[0], hosp[1]);
+                const pin = new Microsoft.Maps.Pushpin(location);
+                map.entities.push(pin);
+            });
+
+            Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+                const directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+                directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.driving });
+
+                const waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(lat, long) });
+                const waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(nearestHosp[0][0], nearestHosp[0][1]) });
+                directionsManager.addWaypoint(waypoint1);
+                directionsManager.addWaypoint(waypoint2);
+
+                directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
+                directionsManager.calculateDirections();
+            });
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const lat = parseFloat(urlParams.get('lat')) || 0;
+            const long = parseFloat(urlParams.get('long')) || 0;
+            const result = urlParams.get('result') || 'Unknown';
+
+            const BingMapsKey = 'AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C';
+            const url = `https://dev.virtualearth.net/REST/v1/locationrecog/${lat},${long}?key=${BingMapsKey}&output=json&r=2&type=Hospitals`;
+
+            let nearestHosp = [];
+
+            fetch(url)
+                .then((res) => {
+                    console.log(res);
+                    if (!res.ok) {
+                        throw new Error(`Network response was not ok: ${res.statusText}`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    const hospitals = data.resourceSets[0].resources[0].businessesAtLocation;
+                    if (!hospitals) {
+                        throw new Error('No hospitals found in the response');
+                    }
+                    nearestHosp = hospitals.map(hosp => [
+                        hosp.businessAddress.latitude,
+                        hosp.businessAddress.longitude
+                    ]);
+                    loadMapScenario(lat, long, nearestHosp);
+                })
+                .catch(e => {
+                    console.error('Error fetching hospital data:', e);
+                    alert('Failed to fetch hospital data. Please try again later.');
                 });
-
-                nearestHosp.forEach(hosp => {
-                    const location = new Microsoft.Maps.Location(hosp[0], hosp[1]);
-                    const pin = new Microsoft.Maps.Pushpin(location);
-                    map.entities.push(pin);
-                });
-
-                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-                    const directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-                    directionsManager.setRequestOptions({ routeMode: Microsoft.Maps.Directions.RouteMode.driving });
-
-                    const waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(lat, long) });
-                    const waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(nearestHosp[0][0], nearestHosp[0][1]) });
-                    directionsManager.addWaypoint(waypoint1);
-                    directionsManager.addWaypoint(waypoint2);
-
-                    directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
-                    directionsManager.calculateDirections();
-                });
-            }
-
-            window.onload = function() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const lat = parseFloat(urlParams.get('lat')) || 0;
-                const long = parseFloat(urlParams.get('long')) || 0;
-                const result = urlParams.get('result') || 'Unknown';
-
-                const BingMapsKey = 'AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C';
-                const url = `http://dev.virtualearth.net/REST/v1/locationrecog/${lat},${long}?key=${BingMapsKey}&output=json&r=2&type=Hospitals`;
-
-                let nearestHosp = [];
-
-                fetch(url)
-                    .then(res => res.json())
-                    .then(data => {
-                        const hospitals = data.resourceSets[0].resources[0].businessesAtLocation;
-                        nearestHosp = hospitals.map(hosp => [
-                            hosp.businessAddress.latitude,
-                            hosp.businessAddress.longitude
-                        ]);
-                        loadMapScenario(lat, long, nearestHosp);
-                    })
-                    .catch(e => console.error('Error fetching hospital data:', e));
-            };
-        </script>
-        
-    </body>
+        };
+    </script>
+</body>
 </html>
