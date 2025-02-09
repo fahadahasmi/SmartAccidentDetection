@@ -32,30 +32,9 @@
     <body>
         <div id="printoutPanel"></div>
         <div id="myMap"></div>
+        <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C" async defer></script>
         <script type="text/javascript">
-            const urlParams = new URLSearchParams(window.location.search);
-            const lat = parseFloat(urlParams.get('lat')) || 0;
-            const long = parseFloat(urlParams.get('long')) || 0;
-            const result = urlParams.get('result') || 'Unknown';
-
-            const BingMapsKey = 'AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C';
-            const url = `http://dev.virtualearth.net/REST/v1/locationrecog/${lat},${long}?key=${BingMapsKey}&output=json&r=2&type=Hospitals`;
-
-            let nearestHosp = [];
-
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    const hospitals = data.resourceSets[0].resources[0].businessesAtLocation;
-                    nearestHosp = hospitals.map(hosp => [
-                        hosp.businessAddress.latitude,
-                        hosp.businessAddress.longitude
-                    ]);
-                    loadMapScenario();
-                })
-                .catch(e => console.error('Error fetching hospital data:', e));
-
-            function loadMapScenario() {
+            function loadMapScenario(lat, long, nearestHosp) {
                 const map = new Microsoft.Maps.Map(document.getElementById('myMap'), {
                     center: new Microsoft.Maps.Location(lat, long),
                     zoom: 12
@@ -80,8 +59,31 @@
                     directionsManager.calculateDirections();
                 });
             }
+
+            window.onload = function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const lat = parseFloat(urlParams.get('lat')) || 0;
+                const long = parseFloat(urlParams.get('long')) || 0;
+                const result = urlParams.get('result') || 'Unknown';
+
+                const BingMapsKey = 'AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C';
+                const url = `http://dev.virtualearth.net/REST/v1/locationrecog/${lat},${long}?key=${BingMapsKey}&output=json&r=2&type=Hospitals`;
+
+                let nearestHosp = [];
+
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => {
+                        const hospitals = data.resourceSets[0].resources[0].businessesAtLocation;
+                        nearestHosp = hospitals.map(hosp => [
+                            hosp.businessAddress.latitude,
+                            hosp.businessAddress.longitude
+                        ]);
+                        loadMapScenario(lat, long, nearestHosp);
+                    })
+                    .catch(e => console.error('Error fetching hospital data:', e));
+            };
         </script>
-        <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=AreUbstMuM9S4g5xAIgaG9fqs4RQ-_n2yyo2IJ89FNOnEsGPBfVtiO-hIboazN9C&callback=loadMapScenario" async defer></script>
         
     </body>
 </html>
